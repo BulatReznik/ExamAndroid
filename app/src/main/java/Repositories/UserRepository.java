@@ -29,6 +29,11 @@ public class UserRepository implements IUserRepository {
         return users;
     }
 
+    @Override
+    public User getUser(int id) {
+        return null;
+    }
+
     public void addUser(User user) {
         users.add(user);
         saveUsers();

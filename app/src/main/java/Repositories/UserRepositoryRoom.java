@@ -24,6 +24,11 @@ public class UserRepositoryRoom implements IUserRepository {
     }
 
     @Override
+    public User getUser(int id) {
+        return userDao.findById(id);
+    }
+
+    @Override
     public void addUser(User user) {
         new Thread(() -> userDao.insertAll(user)).start();
     }
