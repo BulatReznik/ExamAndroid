@@ -17,7 +17,7 @@ import Repositories.IUserRepository;
 import Repositories.UserRepository;
 import Repositories.UserRepositoryRoom;
 
-public class UserFragment extends Fragment {
+public class UserFragment extends Fragment implements UserAddFragment.OnUserAddedListener {
     private static final String ARG_COLUMN_COUNT = "column-count";
     private IUserRepository userRepository;
     private MyUserRecyclerViewAdapter adapter;
@@ -75,16 +75,30 @@ public class UserFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            executorService.execute(() -> {
-                List<User> users = userRepository.getUsers();
-                if (isAdded()) {
-                    requireActivity().runOnUiThread(() -> {
-                        adapter = new MyUserRecyclerViewAdapter(users);
-                        recyclerView.setAdapter(adapter);
-                    });
-                }
-            });
+
+            loadUsers(recyclerView);
         }
         return view;
+    }
+
+    private void loadUsers(RecyclerView recyclerView) {
+        executorService.execute(() -> {
+            List<User> users = userRepository.getUsers();
+            if (isAdded()) {
+                requireActivity().runOnUiThread(() -> {
+                    adapter = new MyUserRecyclerViewAdapter(users);
+                    recyclerView.setAdapter(adapter);
+                });
+            }
+        });
+    }
+
+    @Override
+    public void onUserAdded() {
+        // Обновляем список пользователей после добавления нового
+        if (getView() instanceof RecyclerView) {
+            RecyclerView recyclerView = (RecyclerView) getView();
+            loadUsers(recyclerView);
+        }
     }
 }

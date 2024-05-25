@@ -10,18 +10,19 @@ import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 
-import Dao.UserDao;
 import DbModels.User;
 import Repositories.IUserRepository;
 import Repositories.UserRepository;
 import Repositories.UserRepositoryRoom;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class UserAddFragment extends Fragment {
 
     private OnUserAddedListener listener;
     private IUserRepository userRepository;
-
-    private UserDao userDao;
+    private ExecutorService executorService;
 
     public UserAddFragment() {
         // Required empty public constructor
@@ -32,7 +33,6 @@ public class UserAddFragment extends Fragment {
     }
 
     public static UserAddFragment newInstance() {
-
         return new UserAddFragment();
     }
 
@@ -43,14 +43,12 @@ public class UserAddFragment extends Fragment {
         boolean isDb = true; // Установите значение в true или false в зависимости от выбранного источника данных
 
         if (isDb) {
-            // Создаем экземпляр класса UserRepositoryRoom, передавая объект UserDao
-            UserRepositoryRoom userRepositoryRoom = new UserRepositoryRoom(getContext());
-            userRepository = userRepositoryRoom;
+            userRepository = new UserRepositoryRoom(getContext());
         } else {
-            // Создаем экземпляр класса UserRepository, передавая контекст
-            UserRepository userRepositoryJson = new UserRepository(getContext());
-            userRepository = userRepositoryJson;
+            userRepository = new UserRepository(getContext());
         }
+
+        executorService = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -72,12 +70,21 @@ public class UserAddFragment extends Fragment {
 
                     String firstName = firstNameEditText.getText().toString();
                     String lastName = lastNameEditText.getText().toString();
-                    String age = ageEditText.getText().toString();
-                    userRepository.addUser(new User(firstName, lastName,  Integer.parseInt(age)));
+                    int age = Integer.parseInt(ageEditText.getText().toString());
 
-                    if (listener != null) {
-                        listener.onUserAdded();
-                    }
+                    // Добавляем пользователя в фоновом потоке
+                    executorService.execute(() -> {
+                        userRepository.addUser(new User(firstName, lastName, age));
+
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> {
+                                if (listener != null) {
+                                    listener.onUserAdded();
+                                }
+                            });
+                        }
+                    });
+
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
