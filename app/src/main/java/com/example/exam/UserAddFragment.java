@@ -59,38 +59,34 @@ public class UserAddFragment extends Fragment {
 
         Button addButton = view.findViewById(R.id.button2);
 
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    // Получаем данные
-                    EditText firstNameEditText = view.findViewById(R.id.editTextText3);
-                    EditText lastNameEditText = view.findViewById(R.id.editTextText4);
-                    EditText ageEditText = view.findViewById(R.id.editTextText6);
+        addButton.setOnClickListener(v -> {
+            try {
+                // Получаем данные
+                EditText firstNameEditText = view.findViewById(R.id.editTextText3);
+                EditText lastNameEditText = view.findViewById(R.id.editTextText4);
+                EditText ageEditText = view.findViewById(R.id.editTextText6);
 
-                    String firstName = firstNameEditText.getText().toString();
-                    String lastName = lastNameEditText.getText().toString();
-                    int age = Integer.parseInt(ageEditText.getText().toString());
+                String firstName = firstNameEditText.getText().toString();
+                String lastName = lastNameEditText.getText().toString();
+                int age = Integer.parseInt(ageEditText.getText().toString());
 
-                    // Добавляем пользователя в фоновом потоке
-                    executorService.execute(() -> {
-                        userRepository.addUser(new User(firstName, lastName, age));
+                // Добавляем пользователя в фоновом потоке
+                executorService.execute(() -> {
+                    userRepository.addUser(new User(firstName, lastName, age));
 
-                        if (isAdded()) {
-                            requireActivity().runOnUiThread(() -> {
-                                if (listener != null) {
-                                    listener.onUserAdded();
-                                }
-                            });
-                        }
-                    });
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> {
+                            if (listener != null) {
+                                listener.onUserAdded();
+                            }
+                        });
+                    }
+                });
 
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
         });
-
         return view;
     }
 
@@ -100,7 +96,7 @@ public class UserAddFragment extends Fragment {
         if (context instanceof OnUserAddedListener) {
             listener = (OnUserAddedListener) context;
         } else {
-            throw new RuntimeException(context.toString()
+            throw new RuntimeException(context
                     + " must implement OnUserAddedListener");
         }
     }
