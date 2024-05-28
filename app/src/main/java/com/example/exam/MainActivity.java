@@ -1,6 +1,6 @@
 package com.example.exam;
 
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
@@ -10,7 +10,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity implements UserAddFragment.OnUserAddedListener {
+public class MainActivity extends AppCompatActivity
+        implements CarAddFragment.OnCarAddedListener,
+                    CarUpdateFragment.OnCarUpdatedListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,21 +27,34 @@ public class MainActivity extends AppCompatActivity implements UserAddFragment.O
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, UserFragment.newInstance(1))
+                    .replace(R.id.fragment_container, CarFragment.newInstance(1))
                     .commit();
         }
 
         Button buttonAdd = findViewById(R.id.buttonAdd);
 
         buttonAdd.setOnClickListener(view -> {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, UserAddFragment.newInstance()).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, CarAddFragment.newInstance()).commit();
+        });
+
+        Button buttonReport = findViewById(R.id.buttonReport);
+        buttonReport.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, ReportActivity.class);
+            startActivity(intent);
         });
     }
 
     @Override
-    public void onUserAdded() {
+    public void onCarAdded() {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, UserFragment.newInstance(1))
+                .replace(R.id.fragment_container, CarFragment.newInstance(1))
+                .commit();
+    }
+
+    @Override
+    public void onCarUpdated(){
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, CarFragment.newInstance(1))
                 .commit();
     }
 }

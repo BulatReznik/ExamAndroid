@@ -14,23 +14,27 @@ import android.widget.AdapterView;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import DbModels.User;
-import Repositories.IUserRepository;
-import Repositories.UserRepositoryRoom;
 
-public class UserFragment extends Fragment implements UserAddFragment.OnUserAddedListener, AdapterView.OnItemLongClickListener {
+import DbModels.Car;
+import Repositories.Car.CarRepositoryRoom;
+import Repositories.Car.ICarRepository;
+
+public class CarFragment extends Fragment implements CarAddFragment.OnCarAddedListener,
+        AdapterView.OnItemLongClickListener,
+        CarUpdateFragment.OnCarUpdatedListener {
+
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private IUserRepository userRepository;
-    private MyUserRecyclerViewAdapter adapter;
+    private ICarRepository carRepository;
+    private MyCarRecyclerViewAdapter adapter;
     private ExecutorService executorService;
     private int mColumnCount = 1;
 
-    public UserFragment() {
+    public CarFragment() {
     }
 
     @SuppressWarnings("unused")
-    public static UserFragment newInstance(int columnCount) {
-        UserFragment fragment = new UserFragment();
+    public static CarFragment newInstance(int columnCount) {
+        CarFragment fragment = new CarFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -46,7 +50,7 @@ public class UserFragment extends Fragment implements UserAddFragment.OnUserAdde
                 mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             }
 
-            userRepository = new UserRepositoryRoom(getContext());
+            carRepository = new CarRepositoryRoom(getContext());
             executorService = Executors.newSingleThreadExecutor();
 
         } catch (Exception exception) {
@@ -68,17 +72,17 @@ public class UserFragment extends Fragment implements UserAddFragment.OnUserAdde
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            loadUsers(recyclerView);
+            loadCars(recyclerView);
         }
         return view;
     }
 
-    private void loadUsers(RecyclerView recyclerView) {
+    private void loadCars(RecyclerView recyclerView) {
         executorService.execute(() -> {
-            List<User> users = userRepository.getUsers();
+            List<Car> cars = carRepository.getCars();
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
-                    adapter = new MyUserRecyclerViewAdapter(users, this);
+                    adapter = new MyCarRecyclerViewAdapter(cars, this);
                     recyclerView.setAdapter(adapter);
                 });
             }
@@ -86,25 +90,34 @@ public class UserFragment extends Fragment implements UserAddFragment.OnUserAdde
     }
 
     @Override
-    public void onUserAdded() {
+    public void onCarAdded() {
         if (getView() instanceof RecyclerView) {
             RecyclerView recyclerView = (RecyclerView) getView();
-            loadUsers(recyclerView);
+            loadCars(recyclerView);
         }
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        User user = adapter.getItem(position);
-        openUpdateFragment(user.getId());
+        Car car = adapter.getItem(position);
+        openUpdateFragment(car.getId());
         return true;
     }
 
-    private void openUpdateFragment(int userId) {
-        UserUpdateFragment updateFragment = UserUpdateFragment.newInstance(userId);
+    private void openUpdateFragment(int carId) {
+        CarUpdateFragment updateFragment = CarUpdateFragment.newInstance(carId);
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, updateFragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void onCarUpdated() {
+        // Выполнить обновление списка автомобилей после успешного обновления данных
+        if (getView() instanceof RecyclerView) {
+            RecyclerView recyclerView = (RecyclerView) getView();
+            loadCars(recyclerView);
+        }
     }
 }

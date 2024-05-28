@@ -2,20 +2,20 @@ package com.example.exam;
 
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
 import com.example.exam.databinding.FragmentItemBinding;
 import java.util.List;
-import DbModels.User;
 
-public class MyUserRecyclerViewAdapter extends RecyclerView.Adapter<MyUserRecyclerViewAdapter.ViewHolder> {
+import DbModels.Car;
 
-    private final List<User> mValues;
+public class MyCarRecyclerViewAdapter extends RecyclerView.Adapter<MyCarRecyclerViewAdapter.ViewHolder> {
+
+    private final List<Car> mValues;
     private AdapterView.OnItemLongClickListener mListener;
 
-    public MyUserRecyclerViewAdapter(List<User> items, AdapterView.OnItemLongClickListener listener) {
+    public MyCarRecyclerViewAdapter(List<Car> items, AdapterView.OnItemLongClickListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -27,14 +27,14 @@ public class MyUserRecyclerViewAdapter extends RecyclerView.Adapter<MyUserRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        User user = mValues.get(position);
+        Car car = mValues.get(position);
 
-        holder.mItem = user;
-        holder.mContentView.setText(user.toString());
+        holder.mItem = car;
+        holder.mContentView.setText(car.toString());
 
         holder.itemView.setOnLongClickListener(v -> {
             if (mListener != null) {
-                mListener.onItemLongClick(null, v, holder.getAdapterPosition(), user.getId());
+                mListener.onItemLongClick(null, v, holder.getAdapterPosition(), car.getId());
             }
             return true;
         });
@@ -45,14 +45,14 @@ public class MyUserRecyclerViewAdapter extends RecyclerView.Adapter<MyUserRecycl
         return mValues.size();
     }
 
-    public User getItem(int position) {
+    public Car getItem(int position) {
         return mValues.get(position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView mIdView;
         public final TextView mContentView;
-        public User mItem;
+        public Car mItem;
 
         public ViewHolder(FragmentItemBinding binding) {
             super(binding.getRoot());

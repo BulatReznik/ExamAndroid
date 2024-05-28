@@ -1,4 +1,4 @@
-package Repositories;
+package Repositories.User;
 
 import android.content.Context;
 

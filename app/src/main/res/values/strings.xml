@@ -2,4 +2,9 @@
     <string name="app_name">Exam</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="accepted_count">Accepted Cars: %d</string>
+    <string name="rented_count">Rented Cars: %d</string>
+    <string name="written_off_count">Written Off Cars: %d</string>
+
 </resources>

@@ -10,30 +10,31 @@ import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 
-import DbModels.User;
-import Repositories.IUserRepository;
-import Repositories.UserRepository;
-import Repositories.UserRepositoryRoom;
+import DbModels.Car;
+import DbModels.CarStatus;
+import Repositories.Car.CarRepository;
+import Repositories.Car.CarRepositoryRoom;
+import Repositories.Car.ICarRepository;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class UserAddFragment extends Fragment {
+public class CarAddFragment extends Fragment {
 
-    private OnUserAddedListener listener;
-    private IUserRepository userRepository;
+    private OnCarAddedListener listener;
+    private ICarRepository carRepository;
     private ExecutorService executorService;
 
-    public UserAddFragment() {
+    public CarAddFragment() {
         // Required empty public constructor
     }
 
-    public interface OnUserAddedListener {
-        void onUserAdded();
+    public interface OnCarAddedListener {
+        void onCarAdded();
     }
 
-    public static UserAddFragment newInstance() {
-        return new UserAddFragment();
+    public static CarAddFragment newInstance() {
+        return new CarAddFragment();
     }
 
     @Override
@@ -43,9 +44,9 @@ public class UserAddFragment extends Fragment {
         boolean isDb = true; // Установите значение в true или false в зависимости от выбранного источника данных
 
         if (isDb) {
-            userRepository = new UserRepositoryRoom(getContext());
+            carRepository = new CarRepositoryRoom(getContext());
         } else {
-            userRepository = new UserRepository(getContext());
+            carRepository = new CarRepository(getContext());
         }
 
         executorService = Executors.newSingleThreadExecutor();
@@ -55,29 +56,25 @@ public class UserAddFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_user_add, container, false);
+        View view = inflater.inflate(R.layout.fragment_car_add, container, false);
 
         Button addButton = view.findViewById(R.id.button2);
 
         addButton.setOnClickListener(v -> {
             try {
                 // Получаем данные
-                EditText firstNameEditText = view.findViewById(R.id.editTextText3);
-                EditText lastNameEditText = view.findViewById(R.id.editTextText4);
-                EditText ageEditText = view.findViewById(R.id.editTextText6);
+                EditText modelNameEditText = view.findViewById(R.id.editTextTextModel);
 
-                String firstName = firstNameEditText.getText().toString();
-                String lastName = lastNameEditText.getText().toString();
-                int age = Integer.parseInt(ageEditText.getText().toString());
+                String modelName = modelNameEditText.getText().toString();
 
                 // Добавляем пользователя в фоновом потоке
                 executorService.execute(() -> {
-                    userRepository.addUser(new User(firstName, lastName, age));
+                    carRepository.addCar(new Car(modelName, CarStatus.ACCEPTED ));
 
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() -> {
                             if (listener != null) {
-                                listener.onUserAdded();
+                                listener.onCarAdded();
                             }
                         });
                     }
@@ -93,11 +90,11 @@ public class UserAddFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnUserAddedListener) {
-            listener = (OnUserAddedListener) context;
+        if (context instanceof OnCarAddedListener) {
+            listener = (OnCarAddedListener) context;
         } else {
             throw new RuntimeException(context
-                    + " must implement OnUserAddedListener");
+                    + " must implement OnCarAddedListener");
         }
     }
 
