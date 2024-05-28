@@ -69,7 +69,6 @@ public class UserUpdateFragment extends Fragment {
         }
 
         Button addButton = view.findViewById(R.id.button2);
-        addButton.setText("Update");
 
         addButton.setOnClickListener(v -> {
             try {

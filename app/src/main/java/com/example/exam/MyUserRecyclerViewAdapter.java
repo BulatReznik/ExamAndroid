@@ -30,8 +30,7 @@ public class MyUserRecyclerViewAdapter extends RecyclerView.Adapter<MyUserRecycl
         User user = mValues.get(position);
 
         holder.mItem = user;
-        holder.mIdView.setText(user.getFirstName());
-        holder.mContentView.setText(user.getLastName());
+        holder.mContentView.setText(user.toString());
 
         holder.itemView.setOnLongClickListener(v -> {
             if (mListener != null) {
